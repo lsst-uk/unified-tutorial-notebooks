@@ -1,0 +1,47 @@
+name: Sync UK-RSP content
+
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-uk-rsp:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Clone UK notebooks repository
+        run: |
+          git clone https://github.com/lsst-uk/rsp-uk-notebooks.git /tmp/rsp-uk-notebooks
+
+      - name: Copy UK-RSP content into this repo
+        run: |
+          mkdir -p UK-RSP
+          cp -r /tmp/rsp-uk-notebooks/* UK-RSP/
+
+      - name: Commit and push changes
+        env:
+          BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git checkout "$BRANCH"
+          git add UK-RSP
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "Sync UK-RSP content from rsp-uk-notebooks"
+          git push origin "$BRANCH"
