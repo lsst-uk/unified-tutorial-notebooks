@@ -32,7 +32,8 @@ jobs:
       - name: Sync default branch
         env:
           BRANCH: ${{ github.event.repository.default_branch }}
+          UPSTREAM_BRANCH: "main"
         run: |
           git checkout "$BRANCH"
-          git merge --ff-only "upstream/$BRANCH"
+          git merge --ff-only "upstream/$UPSTREAM_BRANCH"
           git push origin "$BRANCH"
