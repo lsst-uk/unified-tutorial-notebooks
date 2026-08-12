@@ -35,5 +35,5 @@ jobs:
           UPSTREAM_BRANCH: "main"
         run: |
           git checkout "$BRANCH"
-          git merge --ff-only "upstream/$UPSTREAM_BRANCH"
+          git merge "upstream/$UPSTREAM_BRANCH" --no-edit -m "Merge upstream/$UPSTREAM_BRANCH into $BRANCH"
           git push origin "$BRANCH"
